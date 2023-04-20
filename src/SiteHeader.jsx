@@ -1,10 +1,13 @@
 import './SiteLayout.css';
 import './SiteHeader.css';
 
+import HeaderCanvas from './HeaderCanvas.jsx';
+
 export default function Header() {
     return (
         <div className="site-row">
             <div className="site-header">
+                <HeaderCanvas />
                 <div className="logo">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
