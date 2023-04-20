@@ -29,20 +29,44 @@ ssaaPass.unbiased = true;
 composer.addPass(ssaaPass);
 
 // Adding first shapes.
-let circleGeometry = new THREE.CircleGeometry(0.25, 32);
-let material = new THREE.MeshBasicMaterial( { color: 0x333333 } );
-
 let shapes = [ ];
-for (let i = -5; i < 5; i++) {
-    for (let j = -5; j < 5; j++) {
-        let shape = new THREE.Mesh(circleGeometry, material);
-        shape.position.x = i;
-        shape.position.y = j;
 
-        shapes.push(shape);
-        scene.add(shape);
+function generateShapes() {
+    camera.updateMatrix();
+    camera.updateMatrixWorld();
+    const frustrum = new THREE.Frustum()
+    const matrix = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    frustrum.setFromProjectionMatrix(matrix)
+
+    // Loosely find the boundaries of the canvas.
+    let x = 1;
+    while (x < 30 && frustrum.containsPoint(new THREE.Vector3(x, 0, 0))) {
+        x++;
+    }
+
+    let y = 1;
+    while (y < 30 && frustrum.containsPoint(new THREE.Vector3(0, y, 0))) {
+        y++;
+    }
+
+    let shapeRaycaster = new THREE.Raycaster();
+    let circleGeometry = new THREE.CircleGeometry(0.25, 32);
+
+    for (let i = -x; i <= x; i += 0.5) {
+        for (let j = -y; j <= y; j += 0.5) {
+            let shape = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial({
+                color: 0x333333
+            }));
+
+            shape.position.x = i;
+            shape.position.y = j;
+
+            shapes.push(shape);
+            scene.add(shape);
+        }
     }
 }
+generateShapes();
 
 // Mouse movement handling.
 const raycaster = new THREE.Raycaster();
@@ -52,20 +76,44 @@ function onPointerMove(event) {
     pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
     raycaster.setFromCamera( pointer, camera );
-
-    for (let shape of shapes) {
-        console.log(shape);
-        let v = raycaster.ray.distanceToPoint(shape.position);
-        if (v < 2) {
-            shape.scale.x = 1.5;
-            shape.scale.y = 1.5;
-        } else {
-            shape.scale.x = 1;
-            shape.scale.y = 1;
-        }
-    }
 }
 window.addEventListener( 'pointermove', onPointerMove );
+
+let scalePoints = [ ];
+scalePoints.push({
+    scaleValue: 0.5,
+    position: new THREE.Vector3(0, 0, 0)
+});
+
+let colorPoints = [ ];
+colorPoints.push({
+    color: new THREE.Color(0xcc3311),
+    position: new THREE.Vector3(3, -3, 0)
+});
+
+colorPoints.push({
+    color: new THREE.Color(0x0000FF),
+    position: new THREE.Vector3(1, 1, 0)
+});
+
+function updateShapes() {
+    for (let shape of shapes) {
+        let scale = Math.min(1, 1 / raycaster.ray.distanceSqToPoint(shape.position));
+        for (let scalePoint of scalePoints) {
+            scale = Math.max(scale, Math.min(scalePoint.scaleValue, 1 / scalePoint.position.distanceToSquared(shape.position)));
+        }
+        shape.scale.x = shape.scale.y = scale;
+
+        let color = new THREE.Color(0x333333);
+        for (let colorPoint of colorPoints) {
+            let d = Math.min(1, 1 / shape.position.distanceTo(colorPoint.position));
+            let tmpColor = colorPoint.color.clone();
+            tmpColor.multiplyScalar(d);
+            color.add(tmpColor);
+        }
+        shape.material.color = color;
+    }
+}
 
 // Window resize handling.
 function onWindowResize() {
@@ -82,6 +130,7 @@ window.addEventListener( 'resize', onWindowResize );
 
 // Animation loop.
 function animate() {
+    updateShapes();
     requestAnimationFrame(animate);
     composer.render(scene, camera);
 }
