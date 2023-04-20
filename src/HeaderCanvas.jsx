@@ -16,6 +16,16 @@ scene.background = new THREE.Color(0xcccccc);
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.position.z = 5;
 
+// Frustum bounds detection.
+let frustum = new THREE.Frustum();
+function updateFrustum() {
+    camera.updateMatrix();
+    camera.updateMatrixWorld();
+    let matrix = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    frustum.setFromProjectionMatrix(matrix);
+}
+updateFrustum();
+
 // Rendering pipeline.
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -32,20 +42,14 @@ composer.addPass(ssaaPass);
 let shapes = [ ];
 
 function generateShapes() {
-    camera.updateMatrix();
-    camera.updateMatrixWorld();
-    const frustrum = new THREE.Frustum()
-    const matrix = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-    frustrum.setFromProjectionMatrix(matrix)
-
     // Loosely find the boundaries of the canvas.
     let x = 1;
-    while (x < 30 && frustrum.containsPoint(new THREE.Vector3(x, 0, 0))) {
+    while (x < 30 && frustum.containsPoint(new THREE.Vector3(x, 0, 0))) {
         x++;
     }
 
     let y = 1;
-    while (y < 30 && frustrum.containsPoint(new THREE.Vector3(0, y, 0))) {
+    while (y < 30 && frustum.containsPoint(new THREE.Vector3(0, y, 0))) {
         y++;
     }
 
@@ -112,6 +116,8 @@ function updateShapes() {
             color.add(tmpColor);
         }
         shape.material.color = color;
+
+        shape.position.y += 0.005;
     }
 }
 
@@ -122,6 +128,7 @@ function onWindowResize() {
 
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
+    updateFrustum();
 
     renderer.setSize(width, height);
     composer.setSize(width, height);
