@@ -1,0 +1,31 @@
+.site-header {
+  padding: 10vh 10vw;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-header .logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  aspect-ratio: 1 / 1;
+  padding: 3em;
+  border-radius: 100%;
+  background-color: #efefef;
+}
+
+.site-header .logo .label-container {
+  width: min-content;
+}
+
+.site-header .logo .label {
+  display: flex;
+  justify-content: space-between;
+}
+
+.site-header .logo .label.large {
+  font-size: 200%;
+}
