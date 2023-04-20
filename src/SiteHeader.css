@@ -7,6 +7,9 @@
 }
 
 .site-header .logo {
+  font-size: 16px;
+
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,6 +18,20 @@
   padding: 3em;
   border-radius: 100%;
   background-color: #efefef;
+}
+
+.site-header .logo svg {
+  width: 300px;
+  height: 300px;
+  position: absolute;
+}
+
+.site-header .logo svg circle {
+  stroke: #333;
+}
+
+.site-header .logo svg text {
+  fill: #cdcdcd;
 }
 
 .site-header .logo .label-container {

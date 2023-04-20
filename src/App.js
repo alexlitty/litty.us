@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import SiteHeader from './SiteHeader.jsx';
 import SiteSection from './SiteSection.jsx';
 import './App.css';
