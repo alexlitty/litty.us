@@ -14,8 +14,7 @@
   align-items: center;
   justify-content: center;
 
-  aspect-ratio: 1 / 1;
-  padding: 3em;
+  height: 6em;
   border-radius: 100%;
   background-color: #efefef;
 }
@@ -27,14 +26,16 @@
 }
 
 .site-header .logo svg circle {
-  stroke: #333;
+  stroke: #111;
+  fill: #efefef;
 }
 
 .site-header .logo svg text {
-  fill: #cdcdcd;
+  fill: #ccc;
 }
 
 .site-header .logo .label-container {
+  position: absolute;
   width: min-content;
 }
 

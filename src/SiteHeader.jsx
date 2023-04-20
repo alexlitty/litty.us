@@ -27,7 +27,7 @@ export default function Header() {
                                 d="M 145 60 A 90 90 0 0 1 155 240">
                             </path>
                         </defs>
-                        <circle cx="150" cy="150" r="100" fill="none" stroke-width="22" />
+                        <circle cx="150" cy="150" r="100" stroke-width="22" />
                         <text>
                             <textPath xlinkHref="#path1" text-anchor="middle" startOffset="50%">
                             <tspan dy="-0.25em">Software Engineer Extraordinaire</tspan>
