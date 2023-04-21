@@ -100,7 +100,35 @@ generateShapes();
 let scalePoints = [ ];
 scalePoints.push({
     scaleValue: 0.5,
-    position: new THREE.Vector3(0, 0, 0)
+    position: new THREE.Vector3(0, 0, 0),
+    rotation: null
+});
+
+scalePoints.push({
+    scaleValue: 0.75,
+    position: new THREE.Vector3(0, 3, 0),
+    rotation: {
+        axis: new THREE.Vector3(0, 0, -1),
+        radians: 0.01
+    }
+});
+
+scalePoints.push({
+    scaleValue: 0.75,
+    position: new THREE.Vector3(0, -3, 0),
+    rotation: {
+        axis: new THREE.Vector3(0, 0, -1),
+        radians: 0.01
+    }
+});
+
+scalePoints.push({
+    scaleValue: 0.6,
+    position: new THREE.Vector3(0, 1, 0),
+    rotation: {
+        axis: new THREE.Vector3(0, 0, 1),
+        radians: 0.03
+    }
 });
 
 let colorPoints = [ ];
@@ -112,6 +140,15 @@ colorPoints.push({
 colorPoints.push({
     color: new THREE.Color(0x0000FF),
     position: new THREE.Vector3(1, 1, 0)
+});
+
+colorPoints.push({
+    color: new THREE.Color(0x006600),
+    position: new THREE.Vector3(0, 5, 0),
+    rotation: {
+        axis: new THREE.Vector3(0, 0, 1),
+        radians: 0.02
+    }
 });
 
 function moveTopRow() {
@@ -218,7 +255,7 @@ function updateShapes() {
     for (let shape of shapes) {
         let scale = Math.min(1, 1 / raycaster.ray.distanceSqToPoint(shape.position));
         for (let scalePoint of scalePoints) {
-            scale = Math.max(scale, Math.min(scalePoint.scaleValue, 1 / scalePoint.position.distanceTo(shape.position)));
+            scale = Math.max(scale, Math.min(scalePoint.scaleValue, 1 / scalePoint.position.distanceToSquared(shape.position)));
         }
         shape.scale.x = shape.scale.y = scale;
 
@@ -233,6 +270,17 @@ function updateShapes() {
 
         shape.position.add(shapeVelocity);
     }
+}
+
+function advancePointMotion(point) {
+    if (point && point.position && point.rotation) {
+        point.position.applyAxisAngle(point.rotation.axis, point.rotation.radians);
+    }
+}
+
+function updateScalePoints() {
+    scalePoints.forEach((point) => advancePointMotion(point));
+    colorPoints.forEach((point) => advancePointMotion(point));
 }
 
 // Window resize handling.
@@ -251,6 +299,7 @@ window.addEventListener( 'resize', onWindowResize );
 
 // Animation loop.
 function animate() {
+    updateScalePoints();
     moveGrid();
     updateShapes();
     requestAnimationFrame(animate);
