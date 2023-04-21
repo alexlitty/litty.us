@@ -99,6 +99,14 @@ export default function Header() {
                         </div>
                     </div>
                 </div>
+                <a className="info" href="mailto:alexander@litty.us">
+                    <b>Available for hire!</b>
+                </a>
+                <div className="info">
+                    Ex-Googler and<br />prior founder.<br /><br />
+                    Senior lead, fullstack and backend.<br /><br />
+                    Ads, anti-evil,<br />gamedev, and<br />finance industries.
+                </div>
             </div>
         </div>
     );

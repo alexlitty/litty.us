@@ -2,6 +2,7 @@
   position: relative;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: #ccc;
@@ -28,9 +29,8 @@
   align-items: center;
   justify-content: center;
 
-  height: 6em;
-  border-radius: 100%;
-  background-color: #efefef;
+  width: 300px;
+  height: 270px;
 }
 
 .site-header .logo svg {
@@ -60,4 +60,23 @@
 
 .site-header .logo .label.large {
   font-size: 200%;
+}
+
+.site-header .info {
+  width: 160px;
+  z-index: 1;
+  margin-bottom: 1em;
+  padding: 1em;
+  border: 3px solid #000;
+  border-radius: 10px;
+  background-color: #efefef;
+}
+
+.site-header a.info {
+  display: block;
+  color: black;
+}
+
+.site-header a.info:hover {
+  background-color: #ccefcc;
 }
