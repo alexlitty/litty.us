@@ -3,12 +3,37 @@ import './SiteHeader.css';
 
 import HeaderCanvas from './HeaderCanvas.jsx';
 
+// Set up the logo as the "velocity stick" input.
+/*document.addEventListener('', () => {
+    let velocityStick = document.getElementById("site-logo");
+    console.log(velocityStick);
+    velocityStick.ondragstart = () => { return false; };
+
+    function onVelocityStickDown(event) {
+        event.preventDefault();
+
+        let rect = velocityStick.getBoundingClientRect();
+        let origin = {
+            x: rect.left + (rect.width / 2),
+            y: rect.top + (rect.height / 2)
+        };
+
+        console.log(origin);
+
+        function onVelocityStickMove(event) {
+
+        }
+    }
+
+    velocityStick.addEventListener('mousedown', onVelocityStickDown);
+});*/
+
 export default function Header() {
     return (
         <div className="site-row">
             <div className="site-header">
                 <HeaderCanvas />
-                <div className="logo">
+                <div className="logo" id="site-logo">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
                          xmlnsXlink="http://www.w3.org/1999/xlink">

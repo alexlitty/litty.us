@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
 
+// Utility.
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
