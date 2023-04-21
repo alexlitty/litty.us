@@ -8,6 +8,14 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
+function getMiddleElement(arr) {
+    if (arr.length > 0) {
+        return arr[Math.floor((arr.length - 1) / 2)];
+    } else {
+        return null;
+    }
+}
+
 // Scene.
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xcccccc);
@@ -40,6 +48,8 @@ composer.addPass(ssaaPass);
 
 // Adding first shapes.
 let shapes = [ ];
+let shapeGrid = [ ];
+let shapeVelocity = new THREE.Vector3(0.0025, 0.005, 0);
 
 function generateShapes() {
     // Loosely find the boundaries of the canvas.
@@ -56,18 +66,21 @@ function generateShapes() {
     let shapeRaycaster = new THREE.Raycaster();
     let circleGeometry = new THREE.CircleGeometry(0.25, 32);
 
-    for (let i = -x; i <= x; i += 0.5) {
-        for (let j = -y; j <= y; j += 0.5) {
+    for (let i = -y; i <= y; i += 0.5) {
+        let shapeRow = [ ];
+        for (let j = -x; j <= x; j += 0.5) {
             let shape = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial({
                 color: 0x333333
             }));
 
-            shape.position.x = i;
-            shape.position.y = j;
+            shape.position.x = j;
+            shape.position.y = i;
 
+            shapeRow.push(shape);
             shapes.push(shape);
             scene.add(shape);
         }
+        shapeGrid.push(shapeRow);
     }
 }
 generateShapes();
@@ -79,9 +92,9 @@ function onPointerMove(event) {
     pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-    raycaster.setFromCamera( pointer, camera );
+    raycaster.setFromCamera(pointer, camera);
 }
-window.addEventListener( 'pointermove', onPointerMove );
+window.addEventListener('pointermove', onPointerMove);
 
 let scalePoints = [ ];
 scalePoints.push({
@@ -100,7 +113,95 @@ colorPoints.push({
     position: new THREE.Vector3(1, 1, 0)
 });
 
+function moveTopRow() {
+    let delta = shapeGrid.length * 0.5;
+    let row = shapeGrid.pop();
+    for (let shape of row) {
+        shape.position.y -= delta;
+    }
+    shapeGrid.unshift(row);
+}
+
+function moveBottomRow() {
+    let delta = shapeGrid.length * 0.5;
+    let row = shapeGrid.shift();
+    for (let shape of row) {
+        shape.position.y += delta;
+    }
+    shapeGrid.push(row);
+}
+
+function moveRightColumn() {
+    let delta = shapeGrid[0].length * 0.5;
+    for (let row of shapeGrid) {
+        let shape = row.pop();
+        shape.position.x -= delta;
+        row.unshift(shape);
+    }
+}
+
+function moveLeftColumn() {
+    let delta = shapeGrid[0].length * 0.5;
+    for (let row of shapeGrid) {
+        let shape = row.shift();
+        shape.position.x += delta;
+        row.push(shape);
+    }
+}
+
+function isTopRowOob() {
+    if (shapeVelocity.y <= 0) {
+        return false;
+    }
+
+    let shape = getMiddleElement(shapeGrid[shapeGrid.length - 1]);
+    return !frustum.containsPoint(shape.position);
+}
+
+function isBottomRowOob() {
+    if (shapeVelocity.y >= 0) {
+        return false;
+    }
+
+    let shape = getMiddleElement(shapeGrid[0]);
+    return !frustum.containsPoint(shape.position);
+}
+
+function isRightColumnOob() {
+    if (shapeVelocity.x <= 0) {
+        return false;
+    }
+
+    let middleRow = getMiddleElement(shapeGrid);
+    let shape = middleRow[middleRow.length - 1];
+    return !frustum.containsPoint(shape.position);
+}
+
+function isLeftColumnOob() {
+    if (shapeVelocity.x >= 0) {
+        return false;
+    }
+
+    let shape = getMiddleElement(shapeGrid)[0];
+    return !frustum.containsPoint(shape.position);
+}
+
+function moveGrid() {
+    if (isTopRowOob()) {
+        moveTopRow();
+    } else if (isBottomRowOob()) {
+        moveBottomRow();
+    }
+
+    if (isLeftColumnOob()) {
+        moveLeftColumn();
+    } else if (isRightColumnOob()) {
+        moveRightColumn();
+    }
+}
+
 function updateShapes() {
+    // Color and scale.
     for (let shape of shapes) {
         let scale = Math.min(1, 1 / raycaster.ray.distanceSqToPoint(shape.position));
         for (let scalePoint of scalePoints) {
@@ -117,7 +218,7 @@ function updateShapes() {
         }
         shape.material.color = color;
 
-        shape.position.y += 0.005;
+        shape.position.add(shapeVelocity);
     }
 }
 
@@ -137,6 +238,7 @@ window.addEventListener( 'resize', onWindowResize );
 
 // Animation loop.
 function animate() {
+    moveGrid();
     updateShapes();
     requestAnimationFrame(animate);
     composer.render(scene, camera);
