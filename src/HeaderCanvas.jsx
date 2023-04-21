@@ -30,6 +30,7 @@ let frustum = new THREE.Frustum();
 function updateFrustum() {
     camera.updateMatrix();
     camera.updateMatrixWorld();
+    camera.updateProjectionMatrix();
     let matrix = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromProjectionMatrix(matrix);
 }
@@ -58,12 +59,20 @@ function onPointerMove(event) {
 }
 window.addEventListener('pointermove', onPointerMove);
 
-// Adding first shapes.
+// Shape creation.
 let shapes = [ ];
 let shapeGrid = [ ];
 let shapeVelocity = new THREE.Vector3(0.0025, 0.005, 0);
 
 function generateShapes() {
+    // Destroy old shapes, if any.
+    for (let shape of shapes) {
+        shape.removeFromParent();
+    }
+
+    shapes = [ ];
+    shapeGrid = [ ];
+
     // Loosely find the boundaries of the canvas.
     let x = 1;
     while (x < 30 && frustum.containsPoint(new THREE.Vector3(x, 0, 0))) {
@@ -75,12 +84,13 @@ function generateShapes() {
         y++;
     }
 
-    let shapeRaycaster = new THREE.Raycaster();
     let circleGeometry = new THREE.CircleGeometry(0.25, 32);
 
     for (let i = -y; i <= y; i += 0.5) {
         let shapeRow = [ ];
         for (let j = -x; j <= x; j += 0.5) {
+            // Every shape should have its own material, so that it may have its
+            // own independent color.
             let shape = new THREE.Mesh(circleGeometry, new THREE.MeshBasicMaterial({
                 color: 0x333333
             }));
@@ -289,11 +299,11 @@ function onWindowResize() {
     const height = window.innerHeight;
 
     camera.aspect = width / height;
-    camera.updateProjectionMatrix();
     updateFrustum();
 
     renderer.setSize(width, height);
     composer.setSize(width, height);
+    generateShapes();
 }
 window.addEventListener( 'resize', onWindowResize );
 
