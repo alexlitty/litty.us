@@ -218,7 +218,7 @@ function updateShapes() {
     for (let shape of shapes) {
         let scale = Math.min(1, 1 / raycaster.ray.distanceSqToPoint(shape.position));
         for (let scalePoint of scalePoints) {
-            scale = Math.max(scale, Math.min(scalePoint.scaleValue, 1 / scalePoint.position.distanceToSquared(shape.position)));
+            scale = Math.max(scale, Math.min(scalePoint.scaleValue, 1 / scalePoint.position.distanceTo(shape.position)));
         }
         shape.scale.x = shape.scale.y = scale;
 
