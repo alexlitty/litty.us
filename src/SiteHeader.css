@@ -6,6 +6,7 @@
   align-items: center;
   justify-content: center;
   background-color: #ccc;
+  touch-action: none;
 }
 
 .site-header .canvas-container {
