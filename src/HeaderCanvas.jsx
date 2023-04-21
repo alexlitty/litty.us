@@ -46,6 +46,17 @@ ssaaPass.sampleLevel = 2;
 ssaaPass.unbiased = true;
 composer.addPass(ssaaPass);
 
+// Mouse movement handling.
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+function onPointerMove(event) {
+    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    raycaster.setFromCamera(pointer, camera);
+}
+window.addEventListener('pointermove', onPointerMove);
+
 // Adding first shapes.
 let shapes = [ ];
 let shapeGrid = [ ];
@@ -84,17 +95,6 @@ function generateShapes() {
     }
 }
 generateShapes();
-
-// Mouse movement handling.
-const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
-function onPointerMove(event) {
-    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    raycaster.setFromCamera(pointer, camera);
-}
-window.addEventListener('pointermove', onPointerMove);
 
 let scalePoints = [ ];
 scalePoints.push({
@@ -155,7 +155,10 @@ function isTopRowOob() {
     }
 
     let shape = getMiddleElement(shapeGrid[shapeGrid.length - 1]);
-    return !frustum.containsPoint(shape.position);
+    let point = new THREE.Vector3(0, -0.5, 0);
+    point.add(shape.position);
+
+    return !frustum.containsPoint(point);
 }
 
 function isBottomRowOob() {
@@ -164,7 +167,10 @@ function isBottomRowOob() {
     }
 
     let shape = getMiddleElement(shapeGrid[0]);
-    return !frustum.containsPoint(shape.position);
+    let point = new THREE.Vector3(0, 0.5, 0);
+    point.add(shape.position);
+
+    return !frustum.containsPoint(point);
 }
 
 function isRightColumnOob() {
@@ -174,7 +180,10 @@ function isRightColumnOob() {
 
     let middleRow = getMiddleElement(shapeGrid);
     let shape = middleRow[middleRow.length - 1];
-    return !frustum.containsPoint(shape.position);
+    let point = new THREE.Vector3(-0.5, 0, 0);
+    point.add(shape.position);
+
+    return !frustum.containsPoint(point);
 }
 
 function isLeftColumnOob() {
@@ -183,7 +192,10 @@ function isLeftColumnOob() {
     }
 
     let shape = getMiddleElement(shapeGrid)[0];
-    return !frustum.containsPoint(shape.position);
+    let point = new THREE.Vector3(0.5, 0, 0);
+    point.add(shape.position);
+
+    return !frustum.containsPoint(point);
 }
 
 function moveGrid() {
