@@ -103,9 +103,9 @@ export default function Header() {
                     <b>Available for hire!</b>
                 </a>
                 <div className="info">
-                    Ex-Googler and<br />prior founder.<br /><br />
-                    Senior lead, fullstack and backend.<br /><br />
-                    Ads, anti-evil,<br />gamedev, and<br />finance industries.
+                    Founder, Ex-Googler.<br /><br />
+                    Engineering lead, fullstack & backend.<br /><br />
+                    Ads, entertainment, finance, & anti-spam industries.
                 </div>
             </div>
         </div>
